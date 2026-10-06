@@ -125,6 +125,33 @@ border:1px solid rgba(168,50,74,.3);border-radius:16px}
 .dz h4{color:var(--b3);font-size:12px;margin-bottom:8px;
 text-transform:uppercase;letter-spacing:1px}
 .dz p{font-size:11px;color:var(--td);margin-bottom:10px}
+.inp{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--cbd);
+color:var(--t);padding:7px 10px;border-radius:8px;font-size:12px;
+font-family:inherit;margin:5px 0;resize:vertical}
+.inp:focus{outline:none;border-color:var(--e2)}
+textarea.inp{min-height:60px}
+.slider{width:100%;height:6px;-webkit-appearance:none;appearance:none;
+background:rgba(255,255,255,.08);border-radius:99px;outline:none;margin:8px 0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+width:18px;height:18px;background:linear-gradient(135deg,var(--e),var(--e2));
+border-radius:50%;cursor:pointer;box-shadow:0 0 10px rgba(46,204,143,.5)}
+.slider::-moz-range-thumb{width:18px;height:18px;
+background:linear-gradient(135deg,var(--e),var(--e2));border-radius:50%;
+cursor:pointer;border:none}
+.mini-bar{height:8px;background:rgba(255,255,255,.08);border-radius:99px;
+overflow:hidden;margin:6px 0}
+.mini-bar div{height:100%;background:linear-gradient(90deg,var(--e),var(--e2));
+transition:width .5s}
+.check{display:flex;align-items:center;gap:8px;padding:6px 0;
+cursor:pointer;font-size:12px}
+.check input{width:16px;height:16px;accent-color:var(--e2);cursor:pointer}
+.check.done span{text-decoration:line-through;opacity:.5}
+.lang-card{background:var(--cb);border:1px solid var(--cbd);
+border-radius:16px;padding:16px;margin-bottom:14px}
+.lang-card h3{font-size:15px;margin-bottom:10px;color:var(--e3)}
+.skill-row{margin:8px 0}
+.skill-row .label{display:flex;justify-content:space-between;
+font-size:11px;color:var(--td);margin-bottom:4px}
 @media(max-width:600px){body{padding:14px}.grid{grid-template-columns:1fr}
 h1{font-size:22px}.dual{grid-template-columns:1fr}}
 </style>
@@ -152,17 +179,16 @@ h1{font-size:22px}.dual{grid-template-columns:1fr}}
 
 <div class="tabs">
 <button class="tab active" data-p="ov">📊 Обзор</button>
+<button class="tab" data-p="hb">✅ Привычки</button>
 <button class="tab" data-p="ch">♟️ Шахматы</button>
 <button class="tab" data-p="bk">📚 Чтение</button>
 <button class="tab" data-p="dn">💃 Танцы</button>
-<button class="tab" data-p="cl">🏠 Уборка</button>
 <button class="tab" data-p="lg">🌍 Языки</button>
-<button class="tab" data-p="fd">🥗 Питание</button>
+<button class="tab" data-p="cl">🏠 Уборка</button>
 </div>
-
 <div class="panel active" id="ov">
 <div class="sr">
-<div class="ms"><div class="v" id="sh">0/6</div><div class="l">Привычек</div></div>
+<div class="ms"><div class="v" id="sh">0/10</div><div class="l">Отметок сегодня</div></div>
 <div class="ms"><div class="v" id="st">0</div><div class="l">Всего отметок</div></div>
 <div class="ms"><div class="v" id="ss">0</div><div class="l">Дней подряд</div></div>
 <div class="ms"><div class="v" id="sl">1</div><div class="l">Уровень</div></div>
@@ -170,102 +196,278 @@ h1{font-size:22px}.dual{grid-template-columns:1fr}}
 <div class="grid" id="og"></div>
 </div>
 
-<div class="panel" id="ch"><div class="grid">
-<div class="card" data-c="chess">
-<div class="ch"><div class="ct"><span class="ci">♟️</span>Шахматы</div>
-<div class="st" data-sk="chess">🔥 0</div></div>
+<div class="panel" id="hb">
+<div class="grid">
+
+<div class="card" data-c="meals">
+<div class="ch"><div class="ct"><span class="ci">🍽️</span>Приёмы пищи</div>
+<div class="st" data-sk="meals">🔥 0</div></div>
+<div class="ri" style="margin-bottom:8px"><strong id="mealsPct">0 / 4</strong>Отметь приёмы за сегодня</div>
+<div class="mini-bar"><div id="mealsBar" style="width:0%"></div></div>
+<label class="check" data-chk="meal_breakfast"><input type="checkbox" onchange="toggleChk(this,'meal_breakfast','meals')"><span>🌅 Завтрак</span></label>
+<label class="check" data-chk="meal_lunch"><input type="checkbox" onchange="toggleChk(this,'meal_lunch','meals')"><span>☀️ Обед</span></label>
+<label class="check" data-chk="meal_snack"><input type="checkbox" onchange="toggleChk(this,'meal_snack','meals')"><span>🍎 Перекус</span></label>
+<label class="check" data-chk="meal_dinner"><input type="checkbox" onchange="toggleChk(this,'meal_dinner','meals')"><span>🌙 Ужин</span></label>
+</div>
+
+<div class="card" data-c="steps">
+<div class="ch"><div class="ct"><span class="ci">👟</span>Шаги</div>
+<div class="st" data-sk="steps">🔥 0</div></div>
+<div class="ri" style="margin-bottom:8px"><strong id="stepsPct">0%</strong>Цель: 15 000 шагов</div>
+<div class="mini-bar" style="height:12px"><div id="stepsBar" style="width:0%"></div></div>
+<input type="number" class="inp" id="stepsInput" placeholder="Введи количество шагов" oninput="updateSteps(this.value)" min="0">
+<div class="acts"><button class="btn" onclick="addSteps(1000)">+1 000</button>
+<button class="btn" onclick="addSteps(5000)">+5 000</button>
+<button class="btn" onclick="document.getElementById('stepsInput').value='';updateSteps(0)">Сброс</button></div>
+</div>
+
+<div class="card" data-c="stretch">
+<div class="ch"><div class="ct"><span class="ci">🧘</span>Растяжка</div>
+<div class="st" data-sk="stretch">🔥 0</div></div>
+<div class="ri" style="margin-bottom:8px"><strong id="stretchMin">0 мин</strong>Сколько минут сегодня</div>
+<input type="range" class="slider" id="stretchSlider" min="0" max="30" value="0" oninput="updateStretch(this.value)">
+<div class="mini-bar"><div id="stretchBar" style="width:0%"></div></div>
+<div class="acts"><button class="btn p" onclick="done(this,'stretch')">✓ Сделано</button>
+<button class="btn">⏱️ Таймер 5 мин</button></div>
+</div>
+
+<div class="card" data-c="water">
+<div class="ch"><div class="ct"><span class="ci">💧</span>Вода</div>
+<div class="st" data-sk="water">🔥 0</div></div>
 <div class="pr"><div class="ring"><svg width="60" height="60">
 <circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
 <circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
-stroke-dasharray="151" stroke-dashoffset="33"/></svg><div class="pct">78%</div></div>
-<div class="ri"><strong>Точность · 78%</strong>3 партии · 12 задач · 25 мин</div></div>
-<div class="dual">
-<div class="dc ok"><h4>✅ Получилось</h4><ul>
-<li>Вилка конём</li><li>Рокировка</li><li>Двойной удар</li></ul></div>
-<div class="dc bad"><h4>⚠️ Не получилось</h4><ul>
-<li>Цейтнот</li><li>Эндшпиль</li><li>Пешечная структура</li></ul></div>
+stroke-dasharray="151" id="waterRing" stroke-dashoffset="151"/></svg>
+<div class="pct" id="waterPct">0%</div></div>
+<div class="ri"><strong id="waterMl">0 / 2000 мл</strong>Цель: 2 литра</div></div>
+<div class="mini-bar" style="height:10px"><div id="waterBar" style="width:0%"></div></div>
+<div class="acts">
+<button class="btn" onclick="addWater(200)">+200 мл</button>
+<button class="btn" onclick="addWater(300)">+300 мл</button>
+<button class="btn" onclick="addWater(500)">+500 мл</button>
+<button class="btn b" onclick="addWater(-200)">−200</button></div>
 </div>
+
+<div class="card" data-c="selfcare">
+<div class="ch"><div class="ct"><span class="ci">✨</span>Уход за собой</div>
+<div class="st" data-sk="selfcare">🔥 0</div></div>
+<div class="ri" style="margin-bottom:8px"><strong id="carePct">0 / 4</strong>Чек-лист ухода</div>
+<div class="mini-bar"><div id="careBar" style="width:0%"></div></div>
+<label class="check" data-chk="care_shower"><input type="checkbox" onchange="toggleChk(this,'care_shower','selfcare')"><span>🚿 Душ</span></label>
+<label class="check" data-chk="care_skin"><input type="checkbox" onchange="toggleChk(this,'care_skin','selfcare')"><span>🧴 Уход за кожей</span></label>
+<label class="check" data-chk="care_teeth"><input type="checkbox" onchange="toggleChk(this,'care_teeth','selfcare')"><span>🦷 Чистка зубов ×2</span></label>
+<label class="check" data-chk="care_hair"><input type="checkbox" onchange="toggleChk(this,'care_hair','selfcare')"><span>💇 Уход за волосами</span></label>
+<label class="check" data-chk="care_nails"><input type="checkbox" onchange="toggleChk(this,'care_nails','selfcare')"><span>💅 Ногти</span></label>
+</div>
+
+</div>
+</div>
+<div class="panel" id="ch"><div class="grid">
+
+<div class="card" data-c="chess">
+<div class="ch"><div class="ct"><span class="ci">♟️</span>Шахматы</div>
+<div class="st" data-sk="chess">🔥 0</div></div>
+
+<div class="ri" style="margin-bottom:6px"><strong>Прогресс за день</strong></div>
+<div class="mini-bar" style="height:10px"><div id="chessDayBar" style="width:0%"></div></div>
+
+<div class="ri" style="margin:10px 0 6px"><strong>Прогресс за период (неделя)</strong></div>
+<div class="mini-bar" style="height:10px"><div id="chessWeekBar" style="width:0%"></div></div>
+
+<div style="margin:12px 0;padding:10px;background:rgba(0,0,0,.2);border-radius:10px">
+<div style="font-size:12px;color:var(--td);margin-bottom:8px">🎯 3 партии сегодня</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+<span>Партия 1</span>
+<div><button class="btn" style="padding:4px 8px" onclick="setGame(1,'win',this)">🏆 Победа</button>
+<button class="btn b" style="padding:4px 8px" onclick="setGame(1,'lose',this)">💔 Проигрыш</button>
+<button class="btn" style="padding:4px 8px" onclick="setGame(1,'draw',this)">🤝 Ничья</button></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+<span>Партия 2</span>
+<div><button class="btn" style="padding:4px 8px" onclick="setGame(2,'win',this)">🏆 Победа</button>
+<button class="btn b" style="padding:4px 8px" onclick="setGame(2,'lose',this)">💔 Проигрыш</button>
+<button class="btn" style="padding:4px 8px" onclick="setGame(2,'draw',this)">🤝 Ничья</button></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+<span>Партия 3</span>
+<div><button class="btn" style="padding:4px 8px" onclick="setGame(3,'win',this)">🏆 Победа</button>
+<button class="btn b" style="padding:4px 8px" onclick="setGame(3,'lose',this)">💔 Проигрыш</button>
+<button class="btn" style="padding:4px 8px" onclick="setGame(3,'draw',this)">🤝 Ничья</button></div></div>
+</div>
+<div style="font-size:11px;color:var(--e3);margin-top:8px" id="chessScore">🏆 0 · 🤝 0 · 💔 0</div>
+</div>
+
+<div style="margin:10px 0;padding:10px;background:rgba(0,0,0,.2);border-radius:10px">
+<div style="font-size:12px;color:var(--td);margin-bottom:6px">⏱️ Время игры (мин)</div>
+<input type="range" class="slider" min="0" max="90" value="0" id="chessTime" oninput="updateChessTime(this.value)">
+<div style="font-size:11px;color:var(--e3)" id="chessTimeLabel">0 мин (цель 30)</div>
+</div>
+
+<label class="check" data-chk="chess_task"><input type="checkbox" onchange="toggleChk(this,'chess_task','chess')"><span>🧩 Задача дня решена</span></label>
+
 <div class="acts"><button class="btn p" onclick="done(this,'chess')">✓ Готово</button>
-<button class="btn">📎 Партия</button><button class="btn b">🧠 Разбор</button></div>
+<button class="btn">📎 Партия</button></div>
 </div>
+
 <div class="card"><div class="ct" style="margin-bottom:12px">
 <span class="ci">🎓</span>Радар навыков</div>
-<div class="lr"><span class="lf">🎭</span><div class="ln">Дебюты</div>
-<div class="lb"><div style="width:60%"></div></div></div>
-<div class="lr"><span class="lf">⚔️</span><div class="ln">Тактика</div>
-<div class="lb"><div style="width:78%"></div></div></div>
-<div class="lr"><span class="lf">🧭</span><div class="ln">Стратегия</div>
-<div class="lb"><div style="width:45%"></div></div></div>
-<div class="lr"><span class="lf">🏁</span><div class="ln">Эндшпиль</div>
-<div class="lb"><div style="width:38%"></div></div></div>
-<div class="lr"><span class="lf">🧮</span><div class="ln">Расчёт</div>
-<div class="lb"><div style="width:55%"></div></div></div>
-<div class="lr"><span class="lf">⏱️</span><div class="ln">Тайм-менеджмент</div>
-<div class="lb"><div style="width:30%"></div></div></div>
-</div></div></div>
+<div class="skill-row"><div class="label"><span>🎭 Дебюты</span><span id="chSk1v">60%</span></div>
+<input type="range" class="slider" min="0" max="100" value="60" oninput="setSkill('chSk1',this.value)"></div>
+<div class="skill-row"><div class="label"><span>⚔️ Тактика</span><span id="chSk2v">78%</span></div>
+<input type="range" class="slider" min="0" max="100" value="78" oninput="setSkill('chSk2',this.value)"></div>
+<div class="skill-row"><div class="label"><span>🧭 Стратегия</span><span id="chSk3v">45%</span></div>
+<input type="range" class="slider" min="0" max="100" value="45" oninput="setSkill('chSk3',this.value)"></div>
+<div class="skill-row"><div class="label"><span>🏁 Эндшпиль</span><span id="chSk4v">38%</span></div>
+<input type="range" class="slider" id min="0" max="100"=" value="38" oninput="setSkill('chSk4',this.value)"></div>
+<div class="skill-row"><div class="label"><span>🧮 Расчёт</span><span id="chSk5v">55%</span></div>
+<input type="range" class="slider" min="0" max="100" value="55" oninput="setSkill('chSk5',this.value)"></div>
+<div class="skill-row"><div class="label"><span>⏱️ Тайм-менеджмент</span><span id="chSk6v">30%</span></div>
+<input type="range" class="slider" min="0" max="100" value="30" oninput="setSkill('chSk6',this.value)"></div>
+</div>
+
+</div></div>
 
 <div class="panel" id="bk"><div class="grid">
+
 <div class="card" data-c="books">
 <div class="ch"><div class="ct"><span class="ci">📖</span>Чтение</div>
 <div class="st" data-sk="books">🔥 0</div></div>
 <div class="pr"><div class="ring"><svg width="60" height="60">
 <circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
 <circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
-stroke-dasharray="151" stroke-dashoffset="83"/></svg><div class="pct">45%</div></div>
-<div class="ri"><strong>Мастер и Маргарита</strong>
-Булгаков · 🏷️ Роман · ⭐⭐⭐⭐<br>216 / 480 стр</div></div>
-<div class="dual">
-<div class="dc ok"><h4>✨ Впечатления</h4><ul>
-<li>Глубокие диалоги</li><li>Атмосфера Москвы</li></ul></div>
-<div class="dc bad"><h4>📝 Заметки</h4><ul>
-<li>Философские главы</li></ul></div>
+stroke-dasharray="151" id="bookRing" stroke-dashoffset="83"/></svg>
+<div class="pct" id="bookPct">45%</div></div>
+<div class="ri"><strong id="bookTitle">Мастер и Маргарита</strong>
+<span id="bookInfo">Булгаков · Роман · 216/480 стр</span></div></div>
+
+<input type="text" class="inp" id="bookTitleInput" placeholder="Название книги" oninput="updateBook(this,'title')">
+<input type="text" class="inp"bookAuthorInput" placeholder="Автор" oninput="updateBook(this,'author')">
+<input type="text" class="inp" id="bookGenreInput" placeholder="Жанр" oninput="updateBook(this,'genre')">
+<div style="display:flex;gap:6px">
+<input type="number" class="inp" id="bookCur" placeholder="Стр. сейчас" oninput="updateBook(this,'cur')">
+<input type="number" class="inp" id="6bookTotal" placeholder="Всего стр." oninput="updateBook(this,'pxtotal')">
 </div>
+
+">
+<div class="dual" style<div="grid-template-column class="s:1fr">
+<div class="dc ok"><h4>✨ Впечатление (введи вручную)</h4>
+<textarea class="inp" id="bookImpression" placeholder="Что понравилось, что зацепило..." oninput="updateBook(this,'impression')"></textarea></div>
+</div>
+<div class="dual" style="grid-template-columns:1fr;margin-top:6px">
+<div class="dc bad"><h4>📝 Заметки (введи вручную)</h4>
+<textarea class="inp" id="bookNotes" placeholder="Мысли, вопросы, цитаты..." oninput="updateBook(this,'notes')"></textarea></div>
+</div>
+
 <div class="acts"><button class="btn p" onclick="done(this,'books')">✓ Готово</button>
-<button class="btn">+5 стр</button><button class="btn">+10 стр</button></div>
+<button class="btn" onclick="addPages(5)">+5 стр</button>
+<button class="btn" onclick="addPages(10)">+10 стр</button></div>
 </div>
-<div class="card"><div class="ct" style="margin-bottom:12px">
-<span class="ci">📚</span>Библиотека</div>
-<div class="lr"><span class="lf">📖</span><div class="ln">Читаю сейчас<small>2 книги</small></div>
-<div class="lb"><div style="width:45%"></div></div></div>
-<div class="lr"><span class="lf">✅</span><div class="ln">Прочитано<small>12 книг за год</small></div>
-<div class="lb"><div style="width:75%"></div></div></div>
-<div class="lr"><span class="lf">🌱</span><div class="ln">Хочу прочитать<small>8 книг</small></div>
-<div class="lb"><div style="width:20%"></div></div></div>
-<div style="margin-top:12px;font-size:11px;color:var(--td)">
-📊 Прогноз: при 20 стр/день закончишь через 13 дней</div>
-</div></div></div>
+
+</div></div>
 
 <div class="panel" id="dn"><div class="grid">
+
 <div class="card" data-c="dance">
-<div class="ch"><div class="ct"><span class="ci">💃</span>Лезгинка</div>
+<div class="ch"><div class="ct"><span class="ci">💃</span>Танцы</div>
 <div class="st" data-sk="dance">🔥 0</div></div>
-<div class="pr"><div class="ring"><svg width="60" height="60">
-<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
-<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
-stroke-dasharray="151" stroke-dashoffset="45"/></svg><div class="pct">70%</div></div>
-<div class="ri"><strong>Освоение · 70%</strong>Сольный · 6/8 · 45 мин</div></div>
-<div class="dual">
-<div class="dc ok"><h4>✅ Получилось</h4><ul>
-<li>Ход вперёд</li><li>Осанка</li><li>Ритм 6/8</li></ul></div>
-<div class="dc bad"><h4>⚠️ Не получилось</h4><ul>
-<li>Поворот на носках</li><li>Синхрон рук</li></ul></div>
+
+<div class="ri" style="margin-bottom:6px"><strong>Выбор танца (введи вручную)</strong></div>
+<input type="text" class="inp" id="danceName" placeholder="Например: Лезгинка, Хонга..." oninput="updateDance(this,'name')">
+
+<div class="ri" style="margin:10px 0 6px"><strong>Шкала прогресса за день</strong></div>
+<input type="range" class="slider" id="danceProgress" min="0" max="100" value="0" oninput="updateDance(this,'progress')">
+<div class="mini-bar"><div id="danceBar" style="width:0%"></div></div>
+<div style="font-size:11px;color:var(--e3)" id="dancePctLabel">0%</div>
+
+<div class="dual" style="grid-template-columns:1fr;margin-top:10px">
+<div class="dc ok"><h4>✅ Получилось (введи вручную)</h4>
+<textarea class="inp" id="danceOK" placeholder="Что удалось, какие движения..." oninput="updateDance(this,'ok')"></textarea></div>
 </div>
+<div class="dual" style="grid-template-columns:1fr;margin-top:dc bad"><h4>⚠️ Не получилось (введи вручную)</h4>
+<textarea class="inp" id="danceBad" placeholder="Что не вышло, над чем работать..." oninput="updateDance(this,'bad')"></textarea></div>
+</div>
+
 <div class="acts"><button class="btn p" onclick="done(this,'dance')">✓ Готово</button>
-<button class="btn">🎥 Видео</button><button class="btn b">📹 Дневник</button></div>
+<button class="btn">🎥 Видео</button></div>
 </div>
-<div class="card"><div class="ct" style="margin-bottom:12px">
-<span class="ci">🎯</span>Требует внимания</div>
-<div style="font-size:12px;color:var(--td);margin-bottom:10px">
-Не получается 3+ дня:</div>
-<div class="lr"><span class="lf">⚠️</span><div class="ln">Поворот на носках<small>5 дней</small></div>
-<div class="lb"><div style="width:25%"></div></div></div>
-<div class="lr"><span class="lf">⚠️</span><div class="ln">Синхрон рук<small>3 дня</small></div>
-<div class="lb"><div style="width:40%"></div></div></div>
-<div style="margin-top:12px;font-size:11px;color:var(--e3)">
-💡 Квест: отработай 1 движение — ×2 XP</div>
-</div></div></div>
+
+</div></div>
+
+<div class="panel" id="lg">
+
+<div class="lang-card" data-lang="en">
+<h3>🇬🇧 Английский</h3>
+<div style="font-size:11px;color:var(--td);margin-bottom:4px">Уровень знания</div>
+<select class="inp" onchange="setLangLevel('en',this.value)">
+<option>A0</option><option>A1</option><option>A2</option>
+<option selected>B1</option><option>B2</option><option>C1</option><option>C2</option>
+</select>
+<div class="ri" style="margin:8px 0 4px"><strong>Прогресс внутри уровня</strong></div>
+<input type="range" class="slider" min="0" max="100" value="40" oninput="setLangProgress('en',this.value)">
+<div class="mini-bar"><div id="enBar" style="width:40%"></div></div>
+<div style="font-size:11px;color:var(--e3)" id="enBarLabel">="40%</div>
+<div class="ri"0 style="margin:10px 0 4px"><strong>Время сегодня</strong></div" max>
+<input type="="number" class="inp" placeholder100="Минут" oninput="setLangTime('en',this.value)" min="0">
+</div>
+
+<div class="lang-card" data-lang="ar">
+<h3>🇸🇦 Арабский</h3>
+<div style="font-size:11px;color:var(--td);margin-bottom:4px">Уровень знания</div>
+<select class="inp" onchange="setLangLevel('ar',this.value)">
+<option>A0</option><option selected>A1</option><option>A2</option>
+<option>B1</option><option>B2</option><option>C1</option><option>C2</option>
+</select>
+<div class="ri" style="margin:8px 0 4px"><strong>Прогресс внутри уровня</strong></div>
+<input type="range" class="slider" min="0" max="100" value="30" oninput="setLangProgress('ar',this.value)">
+<div class="mini-bar"><div id="arBar" style="width:30%"></div></div>
+<div style="font-size:11px;color:var(--e3)" id="arBarLabel">30%</div>
+<div class="ri" style="margin:10px 0 4px"><strong>Время сегодня</strong></div>
+<input type="number" class="inp" placeholder="Минут" oninput="setLangTime('ar',this.value)" min="0">
+</div>
+
+<div class="lang-card" data-lang="tt">
+<h3>🏳️ Татарский</h3>
+<div style="font-size:11px;color:var(--td);margin-bottom:4px">Уровень знания</div>
+<select class="inp" onchange="setLangLevel('tt',this.value)">
+<option>A0</option><option selected>A1</option><option>A2</option>
+<option>B1</option><option>B2</option><option>C1</option><option>C2</option>
+</select>
+<div class="ri" style="margin:8px 0 4px"><strong>Прогресс внутри уровня</strong></div>
+<input type="range" class="slider" min" value="25" oninput="setLangProgress('tt',this.value)">
+<div class="mini-bar"><div id="ttBar" style="width:25%"></div></div>
+<div style="font-size:11px;color:var(--e3)" id="ttBarLabel">25%</div>
+<div class="ri" style="margin:10px 0 4px"><strong>Время сегодня</strong></div>
+<input type="number" class="inp" placeholder="Минут" oninput="setLangTime('tt',this.value)" min="0">
+</div>
+
+<div class="lang-card" data-lang="lez">
+<h3>🏔️ Лезгинский</h3>
+<div style="font-size:11px;color:var(--td);margin-bottom:4px">Уровень знания</div>
+<select class="inp" onchange="setLangLevel('lez',this.value)">
+<option selected>A0</option><option>A1</option><option>A2</option>
+<option>B1</option><option>B2</option><option>C1</option><option>C2</option>
+</select>
+<div class="ri" style="margin:8px 0 4px"><strong>Прогресс внутри уровня</strong></div>
+<input type="range" class="slider" min="0" max="100" value="15" oninput="setLangProgress('lez',this.value)">
+<div class="mini-bar"><div id="lezBar" style="width:15%"></div></div>
+<div style ="font-size:11px;color:var(--e3)" id="lezBarLabel">15%</div>
+<div class="ri" style="margin:10px 0 4px"><strong>Время сегодня</strong></div>
+<input type="number" class="inp" placeholder="Минут" oninput="setLangTime('lez',this.value)" min="0">
+</div>
+
+<div class="lang-card">
+<h3>🎴 Флеш-карточки дня (2 на каждый язык)</h3>
+<div id="flashZone"></div>
+</div>
+
+<div class="lang-card">
+<h3>🎓 Навыки (шкалы для каждого языка)</h3>
+<div id="skillsZone"></div>
+</div>
+
+</div>
 
 <div class="panel" id="cl">
+
 <div class="card" style="margin-bottom:16px">
 <div class="ct" style="margin-bottom:12px"><span class="ci">🏠</span>Выбери зону</div>
 <span class="zc active">🚪 Прихожая</span><span class="zc">🍳 Кухня</span>
@@ -273,6 +475,7 @@ stroke-dasharray="151" stroke-dashoffset="45"/></svg><div class="pct">70%</div><
 <span class="zc">🛋️ Гостиная</span><span class="zc">🖥️ Рабочий стол</span>
 <span class="zc">🚽 Туалет</span><span class="zc">🧺 Стирка</span>
 </div>
+
 <div class="grid">
 <div class="card" data-c="cleaning">
 <div class="ch"><div class="ct"><span class="ci">🍳</span>Кухня</div>
@@ -288,6 +491,7 @@ stroke-dasharray="151" stroke-dashoffset="45"/></svg><div class="pct">70%</div><
 <div class="acts"><button class="btn p" onclick="done(this,'cleaning')">✓ Зона готова</button>
 <button class="btn">📸 Фото</button><button class="btn b">⏱️ 15 мин</button></div>
 </div>
+
 <div class="card"><div class="ct" style="margin-bottom:12px">
 <span class="ci">🧠</span>Методы</div>
 <div style="font-size:12px;color:var(--td);line-height:1.9">
@@ -297,64 +501,9 @@ stroke-dasharray="151" stroke-dashoffset="45"/></svg><div class="pct">70%</div><
 🧺 <b style="color:var(--e3)">Корзина</b> «не знаю куда»<br>
 ⏱️ <b style="color:var(--e3)">Таймер 10</b>: «что успею»<br>
 🔄 <b style="color:var(--e3)">Вернуть сразу</b>: +1 XP
-</div>
-<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--cbd)">
-<div style="font-size:11px;color:var(--td);margin-bottom:5px">Чистота дома</div>
-<div class="lb" style="width:100%;height:8px"><div style="width:72%"></div></div>
-<div style="font-size:10px;color:var(--e3);margin-top:4px">72% · без перфекционизма</div>
-</div></div></div></div>
-
-<div class="panel" id="lg"><div class="grid">
-<div class="card" data-c="languages">
-<div class="ch"><div class="ct"><span class="ci">🌍</span>4 языка</div>
-<div class="st" data-sk="languages">🔥 0</div></div>
-<div class="lr"><span class="lf">🇬🇧</span><div class="ln">Английский<small>B2 → C1 · 15 мин</small></div><div class="lb"><div style="width:100%"></div></div></div>
-<div class="lr"><span class="lf">🇸🇦</span><div class="ln">Арабский<small>A1 → A2 · 12 мин</small></div><div class="lb"><div style="width:80%"></div></div></div>
-<div class="lr"><span class="lf">🏳️</span><div class="ln">Татарский<small>A1 · 10 мин</small></div><div class="lb"><div style="width:70%"></div></div></div>
-<div class="lr"><span class="lf">🏔️</span><div class="ln">Лезгинский<small>A0 → A1 · 8 мин</small></div><div class="lb"><div style="width:45%"></div></div></div>
-<div class="acts"><button class="btn p" onclick="done(this,'languages')">✓ Готово</button>
-<button class="btn">🎴 Карточки</button><button class="btn b">📚 SRS</button></div>
-</div>
-<div class="card"><div class="ct" style="margin-bottom:12px">
-<span class="ci">🎴</span>Флеш-карточка · Арабский</div>
-<div class="fc" onclick="flip(this)">
-<div class="w">كِتَاب</div><div class="h">👆 нажми для перевода</div></div>
-<div class="dual">
-<div class="dc ok"><h4>✅ Получилось</h4><ul>
-<li>Алфавит</li><li>Приветствия</li><li>Числа 1–20</li></ul></div>
-<div class="dc bad"><h4>⚠️ Не получилось</h4><ul>
-<li>Гортанный "ع"</li><li>Род сущ.</li></ul></div>
 </div></div>
-<div class="card"><div class="ct" style="margin-bottom:12px">
-<span class="ci">🎓</span>Навыки · Арабский</div>
-<div class="lr"><span class="lf">🔤</span><div class="ln">Алфавит</div><div class="lb"><div style="width:60%"></div></div></div>
-<div class="lr"><span class="lf">🗣️</span><div class="ln">Произношение</div><div class="lb"><div style="width:45%"></div></div></div>
-<div class="lr"><span class="lf">👂</span><div class="ln">Аудирование</div><div class="lb"><div style="width:30%"></div></div></div>
-<div class="lr"><span class="lf">📚</span><div class="ln">Грамматика</div><div class="lb"><div style="width:40%"></div></div></div>
-<div class="lr"><span class="lf">🗨️</span><div class="ln">Разговор</div><div class="lb"><div style="width:20%"></div></div></div>
-<div style="margin-top:12px;font-size:11px;color:var(--e3)">
-💡 Квест: 5 слов кухни — ×2 XP</div>
-</div></div></div>
 
-<div class="panel" id="fd"><div class="grid">
-<div class="card" data-c="food">
-<div class="ch"><div class="ct"><span class="ci">🥗</span>Питание</div>
-<div class="st" data-sk="food">🔥 0</div></div>
-<div class="pr"><div class="ring"><svg width="60" height="60">
-<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
-<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
-stroke-dasharray="151" stroke-dashoffset="38"/></svg><div class="pct">75%</div></div>
-<div class="ri"><strong>3 из 4 приёмов</strong>Вода: 6 / 8 стаканов</div></div>
-<div class="dual">
-<div class="dc ok"><h4>✅ Полезное</h4><ul>
-<li>Завтрак: овсянка</li><li>Обед: рыба+овощи</li><li>Перекус: орехи</li></ul></div>
-<div class="dc bad"><h4>💧 Ещё нужно</h4><ul>
-<li>2 стакана воды</li><li>Ужин лёгкий</li></ul></div>
-</div>
-<div class="acts"><button class="btn p" onclick="done(this,'food')">✓ Готово</button>
-<button class="btn">💧 +1 стакан</button><button class="btn b">🍽️ + приём</button></div>
-</div></div></div>
-
+</div></div>
 <div class="dz"><h4>⚠️ Опасная зона</h4>
 <p>Мягкий сброс сохранит XP, но обнулит отметки сегодня. Полный — удалит всё.</p>
 <button class="btn b" onclick="resetDay()">🔄 Сбросить день</button>
@@ -365,9 +514,24 @@ stroke-dasharray="151" stroke-dashoffset="38"/></svg><div class="pct">75%</div><
 <div class="tst" id="tst">+25 XP</div>
 
 <script>
-const K='tracker_v1';
-const NAMES={chess:'♟️ Шахматы',books:'📚 Чтение',dance:'💃 Танцы',
-cleaning:'🏠 Уборка',languages:'🌍 Языки',food:'🥗 Питание'};
+const K='tracker_v2';
+const NAMES={meals:'🍽️ Приёмы пищи',steps:'👟 Шаги',stretch:'🧘 Растяжка',
+water:'💧 Вода',selfcare:'✨ Уход',chess:'♟️ Шахматы',books:'📚 Чтение',
+dance:'💃 Танцы',languages:'🌍 Языки',cleaning:'🏠 Уборка'};
+
+const FLASH={
+en:[{w:'Serendipity',t:'Счастливая случайность'},{w:'Resilient',t:'Устойчивый, стойкий'}],
+ar:[{w:'كِتَاب',t:'Книга'},{w:'مَاء',t:'Вода'}],
+tt:[{w:'Рәхмәт',t:'Спасибо'},{w:'Исәнмесез',t:'Здравствуйте'}],
+lez:[{w:'Салам',t:'Привет'},{w:'Сагъул',t:'Спасибо'}]
+};
+
+const SKILLS={
+en:['🔤 Алфавит','🗣️ Произношение','👂 Аудирование','📚 Грамматика','🗨️ Разговор'],
+ar:['🔤 Алфавит','🗣️ Произношение','👂 Аудирование','📚 Грамматика','🗨️ Разговор'],
+tt:['🔤 Алфавит','🗣️ Произношение','👂 Аудирование','📚 Грамматика','🗨️ Разговор'],
+lez:['🔤 Алфавит','🗣️ Произношение','👂 Аудирование','📚 Грамматика','🗨️ Разговор']
+};
 
 function tk(){const d=new Date();return d.getFullYear()+'-'+
 String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -377,13 +541,15 @@ try{const r=localStorage.getItem(K);
 if(r){const p=JSON.parse(r);
 if(p.lastDate!==tk()){
 if(p.lastDate){p.history=p.history||{};
-p.history[p.lastDate]={completed:{...p.todayCompleted},xp:p.todayXP||0}}
-p.todayCompleted={};p.todayXP=0;p.lastDate=tk();save(p)}
+p.history[p.lastDate]={completed:{...p.todayCompleted},fields:{...p.fields}}} 
+p.todayCompleted={};p.fields=p.fields||{};p.lastDate=tk();saveState(p)}
 return p}}catch(e){}
-return{xp:0,totalCompletions:0,todayCompleted:{},todayXP:0,history:{},lastDate:tk()}}
+return{xp:0,totalCompletions:0,todayCompleted:{},fields:{},
+history:{},lastDate:tk(),checkboxes:{},numbers:{},sliders:{},skills:{}}}
 
 let S=load();
-function save(s){localStorage.setItem(K,JSON.stringify(s||S))}
+function saveState(s){localStorage.setItem(K,JSON.stringify(s||S))}
+function save(){saveState(S)}
 
 const LV=[{n:'Новичок',m:0},{n:'Ученик',m:100},{n:'Практик',m:300},
 {n:'Искатель',m:700},{n:'Мастер',m:1500},{n:'Хранитель',m:3000},{n:'Легенда',m:6000}];
@@ -409,8 +575,8 @@ function updHeader(){
 const c=Object.values(S.todayCompleted).filter(Boolean).length;
 document.getElementById('gs').textContent=calcStreak();
 document.getElementById('ss').textContent=calcStreak();
-document.getElementById('de').textContent=Math.round((c/6)*100)+'%';
-document.getElementById('sh').textContent=c+'/6';
+document.getElementById('de').textContent=Math.min(100,Math.round((c/10)*100))+'%';
+document.getElementById('sh').textContent=c+'/10';
 document.getElementById('st').textContent=S.totalCompletions;
 document.getElementById('xp').textContent=S.xp}
 
@@ -422,13 +588,18 @@ document.getElementById('ln').textContent=l.cur+' / '+l.need+' XP до след�
 document.getElementById('sl').textContent=l.num}
 
 function renderOv(){
-const g=document.getElementById('og');g.innerHTML='';
-const h=[{id:'chess',i:'♟️',n:'Шахматы',s:'3 партии · 78%',p:80},
-{id:'books',i:'📚',n:'Чтение',s:'216/480 стр',p:45},
-{id:'dance',i:'💃',n:'Танцы',s:'45 мин · 70%',p:70},
-{id:'cleaning',i:'🏠',n:'Уборка',s:'Кухня · 18 мин',p:60},
-{id:'food',i:'🥗',n:'Питание',s:'3/4 · 6/8 воды',p:75},
-{id:'languages',i:'🌍',n:'Языки',s:'3/4 языка',p:75}];
+const g=document.getElementById('og');if(!g)return;g.innerHTML='';
+const h=[
+{id:'meals',i:'🍽️',n:'Приёмы пищи',s:'4 приёма',p:S.todayCompleted.meals?100:0},
+{id:'steps',i:'👟',n:'Шаги',s:'15 000 цель',p:S.numbers.steps?Math.min(100,Math.round(S.numbers.steps/150)):0},
+{id:'stretch',i:'🧘',n:'Растяжка',s:'30 мин цель',p:S.sliders.stretch?Math.round(S.sliders.stretch/30*100):0},
+{id:'water',i:'💧',n:'Вода',s:'2 литра',p:S.numbers.water?Math.min(100,Math.round(S.numbers.water/20)):0},
+{id:'selfcare',i:'✨',n:'Уход за собой',s:'5 пунктов',p:S.todayCompleted.selfcare?100:0},
+{id:'chess',i:'♟️',n:'Шахматы',s:'3 партии',p:S.todayCompleted.chess?100:0},
+{id:'books',i:'📚',n:'Чтение',s:'книга дня',p:S.todayCompleted.books?100:0},
+{id:'dance',i:'💃',n:'Танцы',s:'прогресс дня',p:S.sliders.danceProgress||0},
+{id:'languages',i:'🌍',n:'Языки',s:'4 языка',p:S.todayCompleted.languages?100:0},
+{id:'cleaning',i:'🏠',n:'Уборка',s:'зона дня',p:S.todayCompleted.cleaning?100:0}];
 h.forEach(x=>{const d=!!S.todayCompleted[x.id];
 const off=151-(151*x.p/100);
 const c=document.createElement('div');c.className='card'+(d?' done':'');
@@ -438,10 +609,10 @@ c.innerHTML=`<div class="ch"><div class="ct"><span class="ci">${x.i}</span>${x.n
 <circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
 <circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
 stroke-dasharray="151" stroke-dashoffset="${off}"/></svg>
-<div class="pct">${x.p}%</div></div>
+<div class="pct">${Math.round(x.p)}%</div></div>
 <div class="ri"><strong>${x.n}</strong>${x.s}</div></div>
 <div class="acts"><button class="btn ${d?'':'p'}" onclick="done(this,'${x.id}')" ${d?'disabled':''}>
-${d?'✓ Отмечено':'✓ Готово'}</button><button class="btn">+ детали</button></div>`;
+${d?'✓ Отмечено':'✓ Готово'}</button></div>`;
 g.appendChild(c)})}
 
 function updCards(){
@@ -467,23 +638,170 @@ document.body.appendChild(cf);setTimeout(()=>cf.remove(),1800)}
 showT('+25 XP · '+(NAMES[h]||h)+' ✓');
 updHeader();updLvl();updCards();renderOv()}
 
-function showT(t){const el=document.getElementById('tst');el.textContent=t;
-el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
+function showT(t){const el=document.getElementById('tst');if(!el)return;
+el.textContent=t;el.classList.add('show');
+setTimeout(()=>el.classList.remove('show'),2200)}
 
-function flip(el){const w=el.querySelector('.w'),h=el.querySelector('.h');
-if(w.textContent==='كِتَاب'){w.textContent='Книга (кита́б)';h.textContent='👆 нажми ещё'}
-else{w.textContent='كِتَاب';h.textContent='👆 нажми для перевода'}}
+function toggleChk(el,key,parent){
+S.checkboxes[key]=el.checked;
+save();
+el.closest('.check').classList.toggle('done',el.checked);
+updateParentProgress(parent)}
+
+function updateParentProgress(parent){
+if(parent==='meals'){
+const keys=['meal_breakfast','meal_lunch','meal_snack','meal_dinner'];
+const c=keys.filter(k=>S.checkboxes[k]).length;
+document.getElementById('mealsPct').textContent=c+' / 4';
+document.getElementById('mealsBar').style.width=(c/4*100)+'%';
+if(c===4&&!S.todayCompleted.meals){S.todayCompleted.meals=true;S.xp+=25;save();confetti()}}
+if(parent==='selfcare'){
+const keys=['care_shower','care_skin','care_teeth','care_hair','care_nails'];
+const c=keys.filter(k=>S.checkboxes[k]).length;
+document.getElementById('carePct').textContent=c+' / 5';
+document.getElementById('careBar').style.width=(c/5*100)+'%';
+if(c===5&&!S.todayCompleted.selfcare){S.todayCompleted.selfcare=true;S.xp+=25;save();confetti()}}
+updHeader();updLvl()}
+
+function updateSteps(v){
+v=parseInt(v)||0;S.numbers.steps=v;save();
+const pct=Math.min(100,Math.round(v/15000*100));
+document.getElementById('stepsPct').textContent=pct+'%';
+document.getElementById('stepsBar').style.width=pct+'%';
+if(pct>=100&&!S.todayCompleted.steps){S.todayCompleted.steps=true;S.xp+=25;save();confetti()}
+updHeader();updLvl();updCards();renderOv()}
+function addSteps(n){const inp=document.getElementById('stepsInput');
+const v=(parseInt(inp.value)||0)+n;inp.value=v;updateSteps(v)}
+
+function updateStretch(v){v=parseInt(v)||0;S.sliders.stretch=v;save();
+document.getElementById('stretchMin').textContent=v+' мин';
+document.getElementById('stretchBar').style.width=Math.min(100,v/30*100)+'%'}
+
+function addWater(ml){
+S.numbers.water=Math.max(0,(S.numbers.water||0)+ml);save();
+const w=S.numbers.water;const pct=Math.min(100,Math.round(w/20));
+document.getElementById('waterMl').textContent=w+' / 2000 мл';
+document.getElementById('waterPct').textContent=pct+'%';
+document.getElementById('waterBar').style.width=pct+'%';
+const ring=document.getElementById('waterRing');
+ring.setAttribute('stroke-dashoffset',151-(151*pct/100));
+if(pct>=100&&!S.todayCompleted.water){S.todayCompleted.water=true;S.xp+=25;save();confetti()}
+updHeader();updLvl();updCards();renderOv()}
+
+function setGame(n,res,btn){
+S.games=S.games||{};S.games['g'+n]=res;save();
+const parent=btn.parentElement;
+parent.querySelectorAll('button').forEach(b=>b.style.opacity='0.4');
+btn.style.opacity='1';
+let w=0,l=0,d=0;
+[1,2,3].forEach(i=>{const r=S.games['g'+i];if(r==='win')w++;else if(r==='lose')l++;else if(r==='draw')d++});
+document.getElementById('chessScore').textContent='🏆 '+w+' · 🤝 '+d+' · 💔 '+l;
+const filled=w+l+d;
+document.getElementById('chessDayBar').style.width=(filled/3*100)+'%';
+document.getElementById('chessWeekBar').style.width=(filled/21*100)+'%'}
+
+function updateChessTime(v){v=parseInt(v)||0;S.sliders.chessTime=v;save();
+document.getElementById('chessTimeLabel').textContent=v+' мин (цель 30)'}
+
+function setSkill(id,v){S.skills=S.skills||{};S.skills[id]=v;save();
+const el=document.getElementById(id+'v');if(el)el.textContent=v+'%'}
+
+function updateBook(el,field){S.fields['book_'+field]=el.value;save();}
+
+function addPages(n){
+const cur=parseInt(S.fields.book_cur)||0;
+S.fields.book_cur=cur+n;save();
+document.getElementById('bookCur').value=S.fields.book_cur;
+updateBookRing()}
+
+function updateBookRing(){
+const cur=parseInt(S.fields.book_cur)||0;
+const total=parseInt(S.fields.book_total)||480;
+const pct=Math.min(100,Math.round(cur/total*100));
+document.getElementById('bookPct').textContent=pct+'%';
+document.getElementById('bookInfo').textContent=
+(S.fields.book_author||'Автор')+' · '+(S.fields.book_genre||'Жанр')+' · '+cur+'/'+total+' стр';
+const ring=document.getElementById('bookRing');
+ring.setAttribute('stroke-dashoffset',151-(151*pct/100))}
+
+function updateDance(el,field){S.fields['dance_'+field]=el.value;save();
+if(field==='progress'){S.sliders.danceProgress=parseInt(el.value)||0;save();
+document.getElementById('danceBar').style.width=el.value+'%';
+document.getElementById('dancePctLabel').textContent=el.value+'%'}}
+
+function setLangLevel(code,level){S.fields['level_'+code]=level;save()}
+function setLangProgress(code,v){S.fields['prog_'+code]=v;save();
+document.getElementById('"+code+"Bar').style.width=v+'%';
+document.getElementById(code+'BarLabel').textContent=v+'%'}
+function setLangTime(code,v){S.fields['time_'+code]=v;save()}
+
+function renderFlash(){
+const zone=document.getElementById('flashZone');if(!zone)return;zone.innerHTML='';
+const flags={en:'🇬🇧',ar:'🇸🇦',tt:'🏳️',lez:'🏔️'};
+Object.keys(FLASH).forEach(code=>{
+FLASH[code].forEach((card,i)=>{
+const key='fc_'+code+'_'+i;
+const ok=S.fields[key+'_ok']||'';
+const bad=S.fields[key+'_bad']||'';
+const div=document.createElement('div');
+div.style.cssText='background:rgba(0,0,0,.2);border-radius:10px;padding:12px;margin:8px 0';
+div.innerHTML=`<div style="font-size:11px;color:var(--td);margin-bottom:6px">${flags[code]} ${code.toUpperCase()} · карточка ${i+1}</div>
+<div class="fc" onclick="flipFc(this)" style="margin:0 0 8px;min-height:70px">
+<div class="w">${card.w}</div><div class="h">👆 нажми для перевода</div></div>
+<div class="dual" style="grid-template-columns:1fr">
+<div class="dc ok"><h4>✅ Получилось (введи)</h4>
+<textarea class="inp" placeholder="Что удалось..." oninput="setFc('${key}','ok',this.value)">${ok}</textarea></div>
+</div>
+<div class="dual" style="grid-template-columns:1fr;margin-top:6px">
+<div class="dc bad"><h4>⚠️ Не получилось (введи)</h4>
+<textarea class="inp" placeholder="Что не вышло..." oninput="setFc('${key}','bad',this.value)">${bad}</textarea></div>
+</div>`;
+zone.appendChild(div)})})}
+
+function flipFc(el){const w=el.querySelector('.w'),h=el.querySelector('.h');
+const cur=w.textContent;
+if(h.textContent.includes('нажми для перевода')){
+Object.keys(FLASH).forEach(code=>{
+FLASH[code].forEach(c=>{if(c.w===cur){w.textContent=c.t;h.textContent='👆 нажми ещё'}})})}
+else{
+Object.keys(FLASH).forEach(code=>{
+FLASH[code].forEach(c=>{if(c.t===cur){w.textContent=c.w;h.textContent='👆 нажми для перевода'}})})}}
+
+function setFc(key,field,v){S.fields[key+'_'+field]=v;save()}
+
+function renderSkills(){
+const zone=document.getElementById('skillsZone');if(!zone)return;zone.innerHTML='';
+const flags={en:'🇬🇧',ar:'🇸🇦',tt:'🏳️',lez:'🏔️'};
+Object.keys(SKILLS).forEach(code=>{
+const div=document.createElement('div');
+div.style.cssText='margin:12px 0;padding:10px;background:rgba(0,0,0,.15);border-radius:10px';
+let html=`<div style="font-size:13px;color:var(--e3);margin-bottom:8px">${flags[code]} ${code.toUpperCase()}</div>`;
+SKILLS[code].forEach((name,i)=>{
+const key='sk_'+code+'_'+i;
+const val=S.skills[key]||0;
+html+=`<div class="skill-row"><div class="label"><span>${name}</span><span id="${key}v">${val}%</span></div>
+<input type="range" class="slider" min="0" max="100" value="${val}" oninput="setLangSkill('${key}',this.value)"></div>`});
+div.innerHTML=html;zone.appendChild(div)})}
+
+function setLangSkill(key,v){S.skills=S.skills||{};S.skills[key]=v;save();
+const el=document.getElementById(key+'v');if(el)el.textContent=v+'%'}
+
+function confetti(){
+for(let i=0;i<25;i++){const cf=document.createElement('div');
+cf.className='cf';cf.textContent=['✨','🎉','⭐','💚','🔥','🏆'][Math.floor(Math.random()*6)];
+cf.style.left=(Math.random()*100)+'vw';cf.style.top=(Math.random()*40)+'vh';
+cf.style.animationDelay=(Math.random()*.3)+'s';
+document.body.appendChild(cf);setTimeout(()=>cf.remove(),1800)}}
 
 function resetDay(){
 if(!confirm('Сбросить отметки сегодня?'))return;
-S.todayCompleted={};S.todayXP=0;save();
-updHeader();updCards();renderOv();showT('🔄 День сброшен · без стыда')}
+S.todayCompleted={};S.checkboxes={};S.fields={};save();
+location.reload()}
 
 function resetAll(){
 if(!confirm('⚠️ Удалить ВСЁ?'))return;
 if(!confirm('Точно?'))return;
-localStorage.removeItem(K);S=load();
-updHeader();updLvl();updCards();renderOv();showT('💥 Начинаем заново')}
+localStorage.removeItem(K);location.reload()}
 
 document.addEventListener('DOMContentLoaded',()=>{
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
@@ -495,9 +813,46 @@ document.querySelectorAll('.zc').forEach(x=>x.classList.remove('active'));
 z.classList.add('active')}));
 document.querySelectorAll('.dc li').forEach(l=>l.addEventListener('click',()=>{
 l.classList.toggle('done')}));
+
+// Восстанавливаем состояния
+Object.keys(S.checkboxes||{}).forEach(key=>{
+const cb=document.querySelector(`[data-chk="${key}"] input`);
+if(cb){cb.checked=S.checkboxes[key];cb.closest('.check').classList.toggle('done',cb.checked)}});
+
+if(S.numbers.steps){const el=document.getElementById('stepsInput');
+if(el){el.value=S.numbers.steps;updateSteps(S.numbers.steps)}}
+if(S.numbers.water){const el=document.getElementById('waterMl');
+if(el){const w=S.numbers.water;const pct=Math.min(100,Math.round(w/20));
+document.getElementById('waterMl').textContent=w+' / 2000 мл';
+document.getElementById('waterPct').textContent=pct+'%';
+document.getElementById('waterBar').style.width=pct+'%';
+document.getElementById('waterRing').setAttribute('stroke-dashoffset',151-(151*pct/100))}}
+if(S.sliders.stretch){const el=document.getElementById('stretchSlider');
+if(el){el.value=S.sliders.stretch;updateStretch(S.sliders.stretch)}}
+if(S.sliders.chessTime){const el=document.getElementById('chessTime');
+if(el){el.value=S.sliders.chessTime;updateChessTime(S.sliders.chessTime)}}
+
+if(S.fields.book_title){const el=document.getElementById('bookTitleInput');if(el)el.value=S.fields.book_title}
+if(S.fields.book_author){const el=document.getElementById('bookAuthorInput');if(el)el.value=S.fields.book_author}
+if(S.fields.book_genre){const el=document.getElementById('bookGenreInput');if(el)el.value=S.fields.book_genre}
+if(S.fields.book_cur){const el=document.getElementById('bookCur');if(el)el.value=S.fields.book_cur}
+if(S.fields.book_total){const el=document.getElementById('bookTotal');if(el)el.value=S.fields.book_total}
+if(S.fields.book_impression){const el=document.getElementById('bookImpression');if(el)el.value=S.fields.book_impression}
+if(S.fields.book_notes){const el=document.getElementById('bookNotes');if(el)el.value=S.fields.book_notes}
+updateBookRing();
+
+if(S.fields.dance_name){const el=document.getElementById('danceName');if(el)el.value=S.fields.dance_name}
+if(S.fields.dance_ok){const el=document.getElementById('danceOK');if(el)el.value=S.fields.dance_ok}
+if(S.fields.dance_bad){const el=document.getElementById('danceBad');if(el)el.value=S.fields.dance_bad}
+if(S.sliders.danceProgress){const el=document.getElementById('danceProgress');
+if(el){el.value=S.sliders.danceProgress;updateDance(el,'progress')}}
+
+renderFlash();renderSkills();
+updateParentProgress('meals');updateParentProgress('selfcare');
 updHeader();updLvl();updCards();renderOv();
+
 const c=Object.values(S.todayCompleted).filter(Boolean).length;
-setTimeout(()=>showT(c===0?'👋 Новый день · начни с 1':'⚡ Сегодня: '+c+'/6'),600)});
+setTimeout(()=>showT(c===0?'👋 Новый день · начни с 1':'⚡ Сегодня: '+c+'/10'),600)});
 </script>
 </body>
 </html>
