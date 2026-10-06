@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Трекер привычек</title>
+<style>
+:root{
+--n:#0B1B2B;--n2:#122A40;--e:#1F7A5A;--e2:#2ECC8F;--e3:#5FE0AE;
+--b:#6B1F2E;--b2:#A8324A;--b3:#D46A7E;--g:#D4AF37;--gs:#F2D06B;
+--t:#E8F0F5;--td:#8FA5B8;--cb:rgba(18,42,64,.65);--cbd:rgba(46,204,143,.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,sans-serif;
+background:radial-gradient(circle at 20% 0%,#122A40 0%,#0B1B2B 55%,#050E18 100%);
+color:var(--t);min-height:100vh;padding:20px;line-height:1.5}
+.app{max-width:1200px;margin:0 auto}
+h1{font-size:26px;background:linear-gradient(90deg,var(--e2),var(--b3),var(--g));
+-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:4px}
+.sub{color:var(--td);font-size:12px;margin-bottom:16px}
+.hdr{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.pill{background:var(--cb);border:1px solid var(--cbd);backdrop-filter:blur(12px);
+padding:8px 14px;border-radius:999px;font-size:12px}
+.pill b{color:var(--e2);font-size:15px}
+.pill .f{color:var(--b3)}
+.lvl{background:var(--cb);border:1px solid var(--cbd);backdrop-filter:blur(14px);
+border-radius:16px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:16px}
+.fox{font-size:38px;animation:fl 3s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.lvl-i{flex:1}
+.lvl-l{font-size:11px;color:var(--td);text-transform:uppercase;letter-spacing:1px}
+.bar{height:9px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:6px;overflow:hidden}
+.bar-f{height:100%;background:linear-gradient(90deg,var(--e),var(--e2));
+border-radius:99px;transition:width .6s;box-shadow:0 0 12px rgba(46,204,143,.5)}
+.lvl-n{font-size:12px;color:var(--td);margin-top:5px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:var(--cb);border:1px solid var(--cbd);color:var(--td);
+padding:9px 16px;border-radius:999px;cursor:pointer;font-size:13px;
+white-space:nowrap;transition:.25s;font-family:inherit}
+.tab.active{background:linear-gradient(135deg,var(--e),var(--e2));
+color:var(--n);font-weight:600;border-color:transparent;box-shadow:0 0 18px rgba(46,204,143,.35)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:var(--cb);border:1px solid var(--cbd);backdrop-filter:blur(14px);
+border-radius:16px;padding:18px;transition:.3s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;
+background:linear-gradient(90deg,var(--e2),var(--b2));opacity:.6}
+.card:hover{border-color:rgba(46,204,143,.4);transform:translateY(-3px);
+box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.card.done{border-color:rgba(46,204,143,.55);box-shadow:0 0 24px rgba(46,204,143,.18)}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.ct{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:600}
+.ci{font-size:20px;filter:drop-shadow(0 0 6px rgba(46,204,143,.4))}
+.st{font-size:11px;background:linear-gradient(135deg,var(--b),var(--b2));
+padding:3px 9px;border-radius:999px;color:var(--gs);font-weight:600}
+.pr{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ring{position:relative;width:60px;height:60px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring .bg{stroke:rgba(255,255,255,.08)}
+.ring .fill{stroke:url(#gr);stroke-linecap:round;transition:stroke-dashoffset .6s}
+.ring .pct{position:absolute;inset:0;display:flex;align-items:center;
+justify-content:center;font-size:13px;font-weight:700;color:var(--e3)}
+.ri{flex:1;font-size:12px;color:var(--td)}
+.ri strong{color:var(--t);display:block;font-size:13px;margin-bottom:2px}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.dc{background:rgba(0,0,0,.2);border-radius:10px;padding:9px;font-size:11px}
+.dc h4{font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.dc.ok h4{color:var(--e2)}.dc.bad h4{color:var(--b3)}
+.dc ul{list-style:none}
+.dc li{padding:2px 0;color:var(--td);cursor:pointer;border-radius:5px;padding-left:3px}
+.dc li:hover{color:var(--t);background:rgba(255,255,255,.04)}
+.dc li::before{content:'· '}
+.dc li.done{text-decoration:line-through;opacity:.5}
+.acts{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.btn{background:rgba(46,204,143,.1);border:1px solid rgba(46,204,143,.3);
+color:var(--e3);padding:7px 13px;border-radius:9px;cursor:pointer;
+font-size:11px;font-family:inherit;transition:.2s;font-weight:500}
+.btn:hover{background:rgba(46,204,143,.2)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.p{background:linear-gradient(135deg,var(--e),var(--e2));color:var(--n);
+border-color:transparent;font-weight:600}
+.btn.b{background:rgba(107,31,46,.3);border-color:rgba(168,50,74,.5);color:var(--b3)}
+.panel{display:none;animation:fi .4s}
+.panel.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.lr{display:flex;align-items:center;gap:9px;padding:9px 0;
+border-bottom:1px solid rgba(255,255,255,.05)}
+.lr:last-child{border-bottom:none}
+.lf{font-size:20px}
+.ln{flex:1;font-size:12px}
+.ln small{display:block;color:var(--td);font-size:10px}
+.lb{width:70px;height:5px;background:rgba(255,255,255,.08);
+border-radius:99px;overflow:hidden}
+.lb div{height:100%;background:linear-gradient(90deg,var(--e),var(--e2));transition:width .5s}
+.fc{background:linear-gradient(135deg,rgba(31,122,90,.3),rgba(107,31,46,.3));
+border:1px solid rgba(46,204,143,.3);border-radius:12px;padding:20px;
+text-align:center;margin:12px 0;cursor:pointer;transition:.3s;min-height:90px;
+display:flex;flex-direction:column;justify-content:center;gap:6px}
+.fc:hover{transform:scale(1.02)}
+.fc .w{font-size:20px;font-weight:700;color:var(--gs)}
+.fc .h{font-size:11px;color:var(--td)}
+.zc{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.25);
+border:1px solid var(--cbd);padding:5px 11px;border-radius:999px;
+font-size:11px;margin:3px 3px 3px 0;cursor:pointer;transition:.2s}
+.zc.active{background:linear-gradient(135deg,var(--e),var(--e2));
+color:var(--n);font-weight:600;border-color:transparent}
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+gap:10px;margin-bottom:16px}
+.ms{background:var(--cb);border:1px solid var(--cbd);border-radius:12px;
+padding:12px;text-align:center;backdrop-filter:blur(10px)}
+.ms .v{font-size:20px;font-weight:700;color:var(--e2)}
+.ms .l{font-size:10px;color:var(--td);text-transform:uppercase;
+letter-spacing:.5px;margin-top:3px}
+.cf{position:fixed;pointer-events:none;font-size:22px;
+animation:fa 1.5s ease-out forwards;z-index:9999}
+@keyframes fa{0%{transform:translateY(0) rotate(0);opacity:1}
+100%{transform:translateY(400px) rotate(360deg);opacity:0}}
+.tst{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);
+background:linear-gradient(135deg,var(--e),var(--e2));color:var(--n);
+padding:11px 22px;border-radius:999px;font-weight:600;font-size:13px;
+box-shadow:0 8px 32px rgba(46,204,143,.4);
+transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:10000}
+.tst.show{transform:translateX(-50%) translateY(0)}
+.dz{margin-top:28px;padding:18px;background:rgba(107,31,46,.15);
+border:1px solid rgba(168,50,74,.3);border-radius:16px}
+.dz h4{color:var(--b3);font-size:12px;margin-bottom:8px;
+text-transform:uppercase;letter-spacing:1px}
+.dz p{font-size:11px;color:var(--td);margin-bottom:10px}
+@media(max-width:600px){body{padding:14px}.grid{grid-template-columns:1fr}
+h1{font-size:22px}.dual{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="gr" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#2ECC8F"/><stop offset="100%" stop-color="#D4AF37"/>
+</linearGradient></defs></svg>
+
+<div class="app">
+<h1>✦ Трекер привычек</h1>
+<p class="sub">СДВГ Edition · 7 треков · 4 языка · твой ритм</p>
+<div class="hdr">
+<div class="pill"><span class="f">🔥</span> Серия: <b id="gs">0</b> дн</div>
+<div class="pill">⚡ Энергия: <b id="de">0%</b></div>
+<div class="pill">⭐ XP: <b id="xp">0</b></div>
+</div>
+
+<div class="lvl"><div class="fox">🦊</div><div class="lvl-i">
+<div class="lvl-l" id="ll">Уровень 1 · Новичок</div>
+<div class="bar"><div class="bar-f" id="lb" style="width:0%"></div></div>
+<div class="lvl-n" id="ln">0 / 100 XP до следующего уровня</div>
+</div></div>
+
+<div class="tabs">
+<button class="tab active" data-p="ov">📊 Обзор</button>
+<button class="tab" data-p="ch">♟️ Шахматы</button>
+<button class="tab" data-p="bk">📚 Чтение</button>
+<button class="tab" data-p="dn">💃 Танцы</button>
+<button class="tab" data-p="cl">🏠 Уборка</button>
+<button class="tab" data-p="lg">🌍 Языки</button>
+<button class="tab" data-p="fd">🥗 Питание</button>
+</div>
+
+<div class="panel active" id="ov">
+<div class="sr">
+<div class="ms"><div class="v" id="sh">0/6</div><div class="l">Привычек</div></div>
+<div class="ms"><div class="v" id="st">0</div><div class="l">Всего отметок</div></div>
+<div class="ms"><div class="v" id="ss">0</div><div class="l">Дней подряд</div></div>
+<div class="ms"><div class="v" id="sl">1</div><div class="l">Уровень</div></div>
+</div>
+<div class="grid" id="og"></div>
+</div>
+
+<div class="panel" id="ch"><div class="grid">
+<div class="card" data-c="chess">
+<div class="ch"><div class="ct"><span class="ci">♟️</span>Шахматы</div>
+<div class="st" data-sk="chess">🔥 0</div></div>
+<div class="pr"><div class="ring"><svg width="60" height="60">
+<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
+<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
+stroke-dasharray="151" stroke-dashoffset="33"/></svg><div class="pct">78%</div></div>
+<div class="ri"><strong>Точность · 78%</strong>3 партии · 12 задач · 25 мин</div></div>
+<div class="dual">
+<div class="dc ok"><h4>✅ Получилось</h4><ul>
+<li>Вилка конём</li><li>Рокировка</li><li>Двойной удар</li></ul></div>
+<div class="dc bad"><h4>⚠️ Не получилось</h4><ul>
+<li>Цейтнот</li><li>Эндшпиль</li><li>Пешечная структура</li></ul></div>
+</div>
+<div class="acts"><button class="btn p" onclick="done(this,'chess')">✓ Готово</button>
+<button class="btn">📎 Партия</button><button class="btn b">🧠 Разбор</button></div>
+</div>
+<div class="card"><div class="ct" style="margin-bottom:12px">
+<span class="ci">🎓</span>Радар навыков</div>
+<div class="lr"><span class="lf">🎭</span><div class="ln">Дебюты</div>
+<div class="lb"><div style="width:60%"></div></div></div>
+<div class="lr"><span class="lf">⚔️</span><div class="ln">Тактика</div>
+<div class="lb"><div style="width:78%"></div></div></div>
+<div class="lr"><span class="lf">🧭</span><div class="ln">Стратегия</div>
+<div class="lb"><div style="width:45%"></div></div></div>
+<div class="lr"><span class="lf">🏁</span><div class="ln">Эндшпиль</div>
+<div class="lb"><div style="width:38%"></div></div></div>
+<div class="lr"><span class="lf">🧮</span><div class="ln">Расчёт</div>
+<div class="lb"><div style="width:55%"></div></div></div>
+<div class="lr"><span class="lf">⏱️</span><div class="ln">Тайм-менеджмент</div>
+<div class="lb"><div style="width:30%"></div></div></div>
+</div></div></div>
+
+<div class="panel" id="bk"><div class="grid">
+<div class="card" data-c="books">
+<div class="ch"><div class="ct"><span class="ci">📖</span>Чтение</div>
+<div class="st" data-sk="books">🔥 0</div></div>
+<div class="pr"><div class="ring"><svg width="60" height="60">
+<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
+<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
+stroke-dasharray="151" stroke-dashoffset="83"/></svg><div class="pct">45%</div></div>
+<div class="ri"><strong>Мастер и Маргарита</strong>
+Булгаков · 🏷️ Роман · ⭐⭐⭐⭐<br>216 / 480 стр</div></div>
+<div class="dual">
+<div class="dc ok"><h4>✨ Впечатления</h4><ul>
+<li>Глубокие диалоги</li><li>Атмосфера Москвы</li></ul></div>
+<div class="dc bad"><h4>📝 Заметки</h4><ul>
+<li>Философские главы</li></ul></div>
+</div>
+<div class="acts"><button class="btn p" onclick="done(this,'books')">✓ Готово</button>
+<button class="btn">+5 стр</button><button class="btn">+10 стр</button></div>
+</div>
+<div class="card"><div class="ct" style="margin-bottom:12px">
+<span class="ci">📚</span>Библиотека</div>
+<div class="lr"><span class="lf">📖</span><div class="ln">Читаю сейчас<small>2 книги</small></div>
+<div class="lb"><div style="width:45%"></div></div></div>
+<div class="lr"><span class="lf">✅</span><div class="ln">Прочитано<small>12 книг за год</small></div>
+<div class="lb"><div style="width:75%"></div></div></div>
+<div class="lr"><span class="lf">🌱</span><div class="ln">Хочу прочитать<small>8 книг</small></div>
+<div class="lb"><div style="width:20%"></div></div></div>
+<div style="margin-top:12px;font-size:11px;color:var(--td)">
+📊 Прогноз: при 20 стр/день закончишь через 13 дней</div>
+</div></div></div>
+
+<div class="panel" id="dn"><div class="grid">
+<div class="card" data-c="dance">
+<div class="ch"><div class="ct"><span class="ci">💃</span>Лезгинка</div>
+<div class="st" data-sk="dance">🔥 0</div></div>
+<div class="pr"><div class="ring"><svg width="60" height="60">
+<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
+<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
+stroke-dasharray="151" stroke-dashoffset="45"/></svg><div class="pct">70%</div></div>
+<div class="ri"><strong>Освоение · 70%</strong>Сольный · 6/8 · 45 мин</div></div>
+<div class="dual">
+<div class="dc ok"><h4>✅ Получилось</h4><ul>
+<li>Ход вперёд</li><li>Осанка</li><li>Ритм 6/8</li></ul></div>
+<div class="dc bad"><h4>⚠️ Не получилось</h4><ul>
+<li>Поворот на носках</li><li>Синхрон рук</li></ul></div>
+</div>
+<div class="acts"><button class="btn p" onclick="done(this,'dance')">✓ Готово</button>
+<button class="btn">🎥 Видео</button><button class="btn b">📹 Дневник</button></div>
+</div>
+<div class="card"><div class="ct" style="margin-bottom:12px">
+<span class="ci">🎯</span>Требует внимания</div>
+<div style="font-size:12px;color:var(--td);margin-bottom:10px">
+Не получается 3+ дня:</div>
+<div class="lr"><span class="lf">⚠️</span><div class="ln">Поворот на носках<small>5 дней</small></div>
+<div class="lb"><div style="width:25%"></div></div></div>
+<div class="lr"><span class="lf">⚠️</span><div class="ln">Синхрон рук<small>3 дня</small></div>
+<div class="lb"><div style="width:40%"></div></div></div>
+<div style="margin-top:12px;font-size:11px;color:var(--e3)">
+💡 Квест: отработай 1 движение — ×2 XP</div>
+</div></div></div>
+
+<div class="panel" id="cl">
+<div class="card" style="margin-bottom:16px">
+<div class="ct" style="margin-bottom:12px"><span class="ci">🏠</span>Выбери зону</div>
+<span class="zc active">🚪 Прихожая</span><span class="zc">🍳 Кухня</span>
+<span class="zc">🛁 Ванная</span><span class="zc">🛏️ Спальня</span>
+<span class="zc">🛋️ Гостиная</span><span class="zc">🖥️ Рабочий стол</span>
+<span class="zc">🚽 Туалет</span><span class="zc">🧺 Стирка</span>
+</div>
+<div class="grid">
+<div class="card" data-c="cleaning">
+<div class="ch"><div class="ct"><span class="ci">🍳</span>Кухня</div>
+<div class="st" data-sk="cleaning">🔥 0</div></div>
+<div class="dual">
+<div class="dc ok"><h4>✅ Сделано</h4><ul>
+<li>Раковина</li><li>Столешницы</li><li>Мусор</li><li>Посуда</li></ul></div>
+<div class="dc bad"><h4>⏳ Осталось</h4><ul>
+<li>Холодильник</li><li>Плита</li><li>Специи</li></ul></div>
+</div>
+<div style="font-size:11px;color:var(--td);margin:8px 0">
+🎧 Подкаст · ⏱️ 18 мин · ⭐⭐⭐⭐</div>
+<div class="acts"><button class="btn p" onclick="done(this,'cleaning')">✓ Зона готова</button>
+<button class="btn">📸 Фото</button><button class="btn b">⏱️ 15 мин</button></div>
+</div>
+<div class="card"><div class="ct" style="margin-bottom:12px">
+<span class="ci">🧠</span>Методы</div>
+<div style="font-size:12px;color:var(--td);line-height:1.9">
+🍅 <b style="color:var(--e3)">Помодоро</b>: 15 мин → 5 отдых<br>
+📦 <b style="color:var(--e3)">Один ящик</b>: тяжело — 1 ящик<br>
+⬆️ <b style="color:var(--e3)">Верхние</b>: плоскости → полы<br>
+🧺 <b style="color:var(--e3)">Корзина</b> «не знаю куда»<br>
+⏱️ <b style="color:var(--e3)">Таймер 10</b>: «что успею»<br>
+🔄 <b style="color:var(--e3)">Вернуть сразу</b>: +1 XP
+</div>
+<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--cbd)">
+<div style="font-size:11px;color:var(--td);margin-bottom:5px">Чистота дома</div>
+<div class="lb" style="width:100%;height:8px"><div style="width:72%"></div></div>
+<div style="font-size:10px;color:var(--e3);margin-top:4px">72% · без перфекционизма</div>
+</div></div></div></div>
+
+<div class="panel" id="lg"><div class="grid">
+<div class="card" data-c="languages">
+<div class="ch"><div class="ct"><span class="ci">🌍</span>4 языка</div>
+<div class="st" data-sk="languages">🔥 0</div></div>
+<div class="lr"><span class="lf">🇬🇧</span><div class="ln">Английский<small>B2 → C1 · 15 мин</small></div><div class="lb"><div style="width:100%"></div></div></div>
+<div class="lr"><span class="lf">🇸🇦</span><div class="ln">Арабский<small>A1 → A2 · 12 мин</small></div><div class="lb"><div style="width:80%"></div></div></div>
+<div class="lr"><span class="lf">🏳️</span><div class="ln">Татарский<small>A1 · 10 мин</small></div><div class="lb"><div style="width:70%"></div></div></div>
+<div class="lr"><span class="lf">🏔️</span><div class="ln">Лезгинский<small>A0 → A1 · 8 мин</small></div><div class="lb"><div style="width:45%"></div></div></div>
+<div class="acts"><button class="btn p" onclick="done(this,'languages')">✓ Готово</button>
+<button class="btn">🎴 Карточки</button><button class="btn b">📚 SRS</button></div>
+</div>
+<div class="card"><div class="ct" style="margin-bottom:12px">
+<span class="ci">🎴</span>Флеш-карточка · Арабский</div>
+<div class="fc" onclick="flip(this)">
+<div class="w">كِتَاب</div><div class="h">👆 нажми для перевода</div></div>
+<div class="dual">
+<div class="dc ok"><h4>✅ Получилось</h4><ul>
+<li>Алфавит</li><li>Приветствия</li><li>Числа 1–20</li></ul></div>
+<div class="dc bad"><h4>⚠️ Не получилось</h4><ul>
+<li>Гортанный "ع"</li><li>Род сущ.</li></ul></div>
+</div></div>
+<div class="card"><div class="ct" style="margin-bottom:12px">
+<span class="ci">🎓</span>Навыки · Арабский</div>
+<div class="lr"><span class="lf">🔤</span><div class="ln">Алфавит</div><div class="lb"><div style="width:60%"></div></div></div>
+<div class="lr"><span class="lf">🗣️</span><div class="ln">Произношение</div><div class="lb"><div style="width:45%"></div></div></div>
+<div class="lr"><span class="lf">👂</span><div class="ln">Аудирование</div><div class="lb"><div style="width:30%"></div></div></div>
+<div class="lr"><span class="lf">📚</span><div class="ln">Грамматика</div><div class="lb"><div style="width:40%"></div></div></div>
+<div class="lr"><span class="lf">🗨️</span><div class="ln">Разговор</div><div class="lb"><div style="width:20%"></div></div></div>
+<div style="margin-top:12px;font-size:11px;color:var(--e3)">
+💡 Квест: 5 слов кухни — ×2 XP</div>
+</div></div></div>
+
+<div class="panel" id="fd"><div class="grid">
+<div class="card" data-c="food">
+<div class="ch"><div class="ct"><span class="ci">🥗</span>Питание</div>
+<div class="st" data-sk="food">🔥 0</div></div>
+<div class="pr"><div class="ring"><svg width="60" height="60">
+<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
+<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
+stroke-dasharray="151" stroke-dashoffset="38"/></svg><div class="pct">75%</div></div>
+<div class="ri"><strong>3 из 4 приёмов</strong>Вода: 6 / 8 стаканов</div></div>
+<div class="dual">
+<div class="dc ok"><h4>✅ Полезное</h4><ul>
+<li>Завтрак: овсянка</li><li>Обед: рыба+овощи</li><li>Перекус: орехи</li></ul></div>
+<div class="dc bad"><h4>💧 Ещё нужно</h4><ul>
+<li>2 стакана воды</li><li>Ужин лёгкий</li></ul></div>
+</div>
+<div class="acts"><button class="btn p" onclick="done(this,'food')">✓ Готово</button>
+<button class="btn">💧 +1 стакан</button><button class="btn b">🍽️ + приём</button></div>
+</div></div></div>
+
+<div class="dz"><h4>⚠️ Опасная зона</h4>
+<p>Мягкий сброс сохранит XP, но обнулит отметки сегодня. Полный — удалит всё.</p>
+<button class="btn b" onclick="resetDay()">🔄 Сбросить день</button>
+<button class="btn b" onclick="resetAll()" style="margin-left:7px">💥 Полный сброс</button>
+</div>
+
+</div>
+<div class="tst" id="tst">+25 XP</div>
+
+<script>
+const K='tracker_v1';
+const NAMES={chess:'♟️ Шахматы',books:'📚 Чтение',dance:'💃 Танцы',
+cleaning:'🏠 Уборка',languages:'🌍 Языки',food:'🥗 Питание'};
+
+function tk(){const d=new Date();return d.getFullYear()+'-'+
+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+function load(){
+try{const r=localStorage.getItem(K);
+if(r){const p=JSON.parse(r);
+if(p.lastDate!==tk()){
+if(p.lastDate){p.history=p.history||{};
+p.history[p.lastDate]={completed:{...p.todayCompleted},xp:p.todayXP||0}}
+p.todayCompleted={};p.todayXP=0;p.lastDate=tk();save(p)}
+return p}}catch(e){}
+return{xp:0,totalCompletions:0,todayCompleted:{},todayXP:0,history:{},lastDate:tk()}}
+
+let S=load();
+function save(s){localStorage.setItem(K,JSON.stringify(s||S))}
+
+const LV=[{n:'Новичок',m:0},{n:'Ученик',m:100},{n:'Практик',m:300},
+{n:'Искатель',m:700},{n:'Мастер',m:1500},{n:'Хранитель',m:3000},{n:'Легенда',m:6000}];
+
+function getLvl(xp){let i=0;for(let j=0;j<LV.length;j++)if(xp>=LV[j].m)i=j;
+const c=LV[i],n=LV[i+1]||{m:c.m+1000};
+return{num:i+1,name:c.n,prog:Math.min(100,((xp-c.m)/(n.m-c.m))*100),
+cur:xp-c.m,need:n.m-c.m}}
+
+function calcStreak(){
+let st=0;const today=new Date();
+for(let i=0;i<60;i++){const d=new Date(today);d.setDate(d.getDate()-i);
+const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+
+String(d.getDate()).padStart(2,'0');
+const day=S.history[k];
+const isToday=i===0&&Object.values(S.todayCompleted).filter(Boolean).length>0;
+if(day&&Object.values(day.completed||{}).filter(Boolean).length>0)st++;
+else if(isToday)st++;
+else if(i===0)continue;
+else break}return st}
+
+function updHeader(){
+const c=Object.values(S.todayCompleted).filter(Boolean).length;
+document.getElementById('gs').textContent=calcStreak();
+document.getElementById('ss').textContent=calcStreak();
+document.getElementById('de').textContent=Math.round((c/6)*100)+'%';
+document.getElementById('sh').textContent=c+'/6';
+document.getElementById('st').textContent=S.totalCompletions;
+document.getElementById('xp').textContent=S.xp}
+
+function updLvl(){
+const l=getLvl(S.xp);
+document.getElementById('ll').textContent='Уровень '+l.num+' · '+l.name;
+document.getElementById('lb').style.width=l.prog+'%';
+document.getElementById('ln').textContent=l.cur+' / '+l.need+' XP до следующего';
+document.getElementById('sl').textContent=l.num}
+
+function renderOv(){
+const g=document.getElementById('og');g.innerHTML='';
+const h=[{id:'chess',i:'♟️',n:'Шахматы',s:'3 партии · 78%',p:80},
+{id:'books',i:'📚',n:'Чтение',s:'216/480 стр',p:45},
+{id:'dance',i:'💃',n:'Танцы',s:'45 мин · 70%',p:70},
+{id:'cleaning',i:'🏠',n:'Уборка',s:'Кухня · 18 мин',p:60},
+{id:'food',i:'🥗',n:'Питание',s:'3/4 · 6/8 воды',p:75},
+{id:'languages',i:'🌍',n:'Языки',s:'3/4 языка',p:75}];
+h.forEach(x=>{const d=!!S.todayCompleted[x.id];
+const off=151-(151*x.p/100);
+const c=document.createElement('div');c.className='card'+(d?' done':'');
+c.innerHTML=`<div class="ch"><div class="ct"><span class="ci">${x.i}</span>${x.n}</div>
+<div class="st">🔥 ${calcStreak()}</div></div>
+<div class="pr"><div class="ring"><svg width="60" height="60">
+<circle class="bg" cx="30" cy="30" r="24" fill="none" stroke-width="5"/>
+<circle class="fill" cx="30" cy="30" r="24" fill="none" stroke-width="5"
+stroke-dasharray="151" stroke-dashoffset="${off}"/></svg>
+<div class="pct">${x.p}%</div></div>
+<div class="ri"><strong>${x.n}</strong>${x.s}</div></div>
+<div class="acts"><button class="btn ${d?'':'p'}" onclick="done(this,'${x.id}')" ${d?'disabled':''}>
+${d?'✓ Отмечено':'✓ Готово'}</button><button class="btn">+ детали</button></div>`;
+g.appendChild(c)})}
+
+function updCards(){
+document.querySelectorAll('.card[data-c]').forEach(c=>{
+const k=c.dataset.c;const b=c.querySelector('.btn.p');if(!b)return;
+const d=!!S.todayCompleted[k];
+if(d){c.classList.add('done');b.textContent='✓ Отмечено';b.disabled=true}
+});
+document.querySelectorAll('[data-sk]').forEach(el=>el.textContent='🔥 '+calcStreak())}
+
+function done(btn,h){
+if(S.todayCompleted[h])return;
+S.todayCompleted[h]=true;
+S.xp+=25;S.totalCompletions+=1;
+save();
+const c=btn.closest('.card');
+if(c){c.classList.add('done');btn.textContent='✓ Отмечено';btn.disabled=true}
+for(let i=0;i<18;i++){const cf=document.createElement('div');
+cf.className='cf';cf.textContent=['✨','🎉','⭐','💚','🔥'][Math.floor(Math.random()*5)];
+cf.style.left=(Math.random()*100)+'vw';cf.style.top=(Math.random()*40)+'vh';
+cf.style.animationDelay=(Math.random()*.3)+'s';
+document.body.appendChild(cf);setTimeout(()=>cf.remove(),1800)}
+showT('+25 XP · '+(NAMES[h]||h)+' ✓');
+updHeader();updLvl();updCards();renderOv()}
+
+function showT(t){const el=document.getElementById('tst');el.textContent=t;
+el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
+
+function flip(el){const w=el.querySelector('.w'),h=el.querySelector('.h');
+if(w.textContent==='كِتَاب'){w.textContent='Книга (кита́б)';h.textContent='👆 нажми ещё'}
+else{w.textContent='كِتَاب';h.textContent='👆 нажми для перевода'}}
+
+function resetDay(){
+if(!confirm('Сбросить отметки сегодня?'))return;
+S.todayCompleted={};S.todayXP=0;save();
+updHeader();updCards();renderOv();showT('🔄 День сброшен · без стыда')}
+
+function resetAll(){
+if(!confirm('⚠️ Удалить ВСЁ?'))return;
+if(!confirm('Точно?'))return;
+localStorage.removeItem(K);S=load();
+updHeader();updLvl();updCards();renderOv();showT('💥 Начинаем заново')}
+
+document.addEventListener('DOMContentLoaded',()=>{
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+t.classList.add('active');document.getElementById(t.dataset.p).classList.add('active')}));
+document.querySelectorAll('.zc').forEach(z=>z.addEventListener('click',()=>{
+document.querySelectorAll('.zc').forEach(x=>x.classList.remove('active'));
+z.classList.add('active')}));
+document.querySelectorAll('.dc li').forEach(l=>l.addEventListener('click',()=>{
+l.classList.toggle('done')}));
+updHeader();updLvl();updCards();renderOv();
+const c=Object.values(S.todayCompleted).filter(Boolean).length;
+setTimeout(()=>showT(c===0?'👋 Новый день · начни с 1':'⚡ Сегодня: '+c+'/6'),600)});
+</script>
+</body>
+</html>
